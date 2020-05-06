@@ -1,0 +1,43 @@
+stages:
+  - test
+  - install
+
+before_script:
+  - export GOSUMDB=off
+
+unit_tests:
+  stage: test
+  script:
+    - make test
+
+race_detector:
+  stage: test
+  script:
+    - make race
+
+# memory_sanitizer:
+#   stage: test
+#   script:
+#     - make msan
+
+code_coverage:
+  stage: test
+  script:
+    - make coverage
+
+code_coverage_report:
+  stage: test
+  script:
+    - make coverhtml
+  only:
+  - master
+
+lint_code:
+  stage: test
+  script:
+    - make lint
+
+install:
+  stage: install
+  script:
+    - make
