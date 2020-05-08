@@ -119,7 +119,7 @@ func (mainServer *ServerStruct) GraceStop() {
 	}
 	if mainServer.loggerLoaded {
 		mainServer.loggerLoaded = false
-		mainServer.logger.Close()
+		_ = mainServer.logger.Close()
 	}
 	if mainServer.isStopped {
 		locker.Lock()
@@ -160,9 +160,11 @@ func (mainServer *ServerStruct) GraceStop() {
 }
 
 func (mainServer *ServerStruct) GraceHandler() {
+	fmt.Println("Start StopFunctions")
 	for _, function := range mainServer.StopFunctions {
 		function()
 	}
+	fmt.Println("Finish StopFunctions")
 	programName := os.Args[0]
 	args := os.Args[1:]
 	var cleanArgs []string
@@ -171,11 +173,13 @@ func (mainServer *ServerStruct) GraceHandler() {
 			cleanArgs = append(cleanArgs, arg)
 		}
 	}
+	fmt.Println("programName = ", programName, cleanArgs)
 	if mainServer.loggerLoaded {
 		mainServer.loggerLoaded = false
-		mainServer.logger.Close()
+		_ = mainServer.logger.Close()
 	}
 	if mainServer.isStopped {
+		fmt.Println("isStopped!")
 		return
 	}
 	mainServer.isStopped = true
@@ -201,10 +205,13 @@ func (mainServer *ServerStruct) GraceHandler() {
 		}
 	}
 
+	fmt.Println("Start StopChannels")
 	for _, channel := range mainServer.StopChannels {
 		*channel <- 1
 		time.Sleep(100 * time.Millisecond)
 	}
+	fmt.Println("Finish StopChannels")
+
 	cleanArgs = append(cleanArgs, fmt.Sprint("-fd=", fd2))
 	cmd := exec.Command(programName, cleanArgs...)
 	e := GoEnvTools.GoEnv{}
