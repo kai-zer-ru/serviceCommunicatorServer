@@ -1,3 +1,4 @@
+github.com/joho/godotenv v1.3.0 h1:Zjp+RcGpHhGlrMbJzXTrZZPrWj+1vfm90La1wgB6Bhc=
 github.com/joho/godotenv v1.3.0/go.mod h1:7hK45KPybAkOC6peb+G5yklZfMxEjkZhHbwpqxOKXbg=
 github.com/kaizer666/goenvtools v1.0.0 h1:4FFPOTIxqwP38yAISZTiX8XO5VC+PHme4JFKxSLUoNI=
 github.com/kaizer666/goenvtools v1.0.0/go.mod h1:616LLYVUPFRtiy4TfpF4Qjyu9WBpkfbh5FbMuTw34/s=
