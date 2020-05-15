@@ -213,7 +213,7 @@ func (mainServer *ServerStruct) GraceHandler() {
 	fmt.Println("Finish StopChannels")
 
 	cleanArgs = append(cleanArgs, fmt.Sprint("-fd=", fd2))
-	cmd := exec.Command(programName, cleanArgs...)
+	cmd := exec.Command("source .env; "+programName, cleanArgs...)
 	e := GoEnvTools.GoEnv{}
 	_ = e.InitEnv()
 	cmd.Env = os.Environ()
