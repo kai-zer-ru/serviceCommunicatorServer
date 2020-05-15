@@ -207,11 +207,10 @@ func (mainServer *ServerStruct) GraceHandler() {
 	_ = e.InitEnv()
 	cmd := exec.Command(programName, cleanArgs...)
 	cmd.Env = append(cmd.Env, os.Environ()...)
-	out, err := cmd.CombinedOutput()
+	err = cmd.Run()
 	if err != nil {
 		panic(fmt.Sprintf("grace starting error: %s", err))
 	}
-	fmt.Println(out)
 	time.Sleep(2 * time.Second)
 	*mainServer.ExitListener <- 1
 }
