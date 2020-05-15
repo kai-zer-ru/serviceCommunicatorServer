@@ -107,9 +107,7 @@ func (mainServer *ServerStruct) StartServer() {
 			_ = mainServer.logger.Critical("error: %v", err)
 		}
 	}
-	fmt.Println("EXITING")
 	<-*mainServer.ExitListener
-	fmt.Println("EXIT")
 }
 
 func (mainServer *ServerStruct) GraceStop() {
@@ -155,16 +153,13 @@ func (mainServer *ServerStruct) GraceStop() {
 	}
 	locker.Unlock()
 	time.Sleep(2 * time.Second)
-	fmt.Println("exit after sleep ")
 	*mainServer.ExitListener <- 1
 }
 
 func (mainServer *ServerStruct) GraceHandler() {
-	fmt.Println("Start StopFunctions")
 	for _, function := range mainServer.StopFunctions {
 		function()
 	}
-	fmt.Println("Finish StopFunctions")
 	programName := os.Args[0]
 	args := os.Args[1:]
 	var cleanArgs []string
@@ -173,17 +168,14 @@ func (mainServer *ServerStruct) GraceHandler() {
 			cleanArgs = append(cleanArgs, arg)
 		}
 	}
-	fmt.Println("programName = ", programName, cleanArgs)
 	if mainServer.loggerLoaded {
 		mainServer.loggerLoaded = false
 		_ = mainServer.logger.Close()
 	}
 	if mainServer.isStopped {
-		fmt.Println("isStopped!")
 		return
 	}
 	mainServer.isStopped = true
-	defer func() { fmt.Println("GoodBye") }()
 	listener2 := mainServer.listener.(*net.TCPListener)
 	file2, err := listener2.File()
 	if err != nil {
@@ -205,24 +197,25 @@ func (mainServer *ServerStruct) GraceHandler() {
 		}
 	}
 
-	fmt.Println("Start StopChannels")
 	for _, channel := range mainServer.StopChannels {
 		*channel <- 1
 		time.Sleep(100 * time.Millisecond)
 	}
-	fmt.Println("Finish StopChannels")
 
 	cleanArgs = append(cleanArgs, fmt.Sprint("-fd=", fd2))
-	cmd := exec.Command("source .env; "+programName, cleanArgs...)
 	e := GoEnvTools.GoEnv{}
 	_ = e.InitEnv()
-	cmd.Env = os.Environ()
-	err = cmd.Start()
+	cmd := exec.Command(programName, cleanArgs...)
+	fmt.Println("ENV = ")
+	fmt.Println(os.Environ())
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Println("grace starting error: ", err)
-		return
+		panic(fmt.Sprintf("grace starting error: %s", err))
 	}
+	fmt.Println(out)
 	time.Sleep(2 * time.Second)
-	fmt.Println("exit after sleep ")
 	*mainServer.ExitListener <- 1
 }
