@@ -10,12 +10,13 @@ import (
 
 type DaemonData struct {
 	ServerAddress string
-	Daemon        struct {
-		DaemonName    string          `json:"name"`
-		DaemonAddress string          `json:"address"`
-		Description   string          `json:"description"`
-		Commands      []CommandStruct `json:"commands"`
-	}
+	Daemon        Daemon
+}
+type Daemon struct {
+	DaemonName    string          `json:"name"`
+	DaemonAddress string          `json:"address"`
+	Description   string          `json:"description"`
+	Commands      []CommandStruct `json:"commands"`
 }
 
 func (d *DaemonData) Register() error {
